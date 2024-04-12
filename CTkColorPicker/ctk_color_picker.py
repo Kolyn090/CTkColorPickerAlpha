@@ -7,6 +7,7 @@ import customtkinter
 from PIL import Image, ImageTk
 import os
 import math
+from my_ctk_components import HexCustomCTkTextbox
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -129,10 +130,12 @@ class AskColor(customtkinter.CTkToplevel):
                                             corner_radius=self.corner_radius, text=self.default_hex_color)
         self.label.pack(fill="both", padx=10, pady=5, side='left')
 
-        self.textbox = customtkinter.CTkTextbox(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
-                                                fg_color=self.default_hex_color,
-                                                corner_radius=self.corner_radius)
+        self.textbox = HexCustomCTkTextbox(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
+                                           set_color=self.set_color,
+                                           fg_color=self.default_hex_color,
+                                           corner_radius=self.corner_radius)
         self.textbox.pack(fill="both", padx=10, pady=5, side='right')
+        self.textbox.insert("end-1c", "#")
 
         self.stack1.pack(fill="both")
 
@@ -213,13 +216,15 @@ class AskColor(customtkinter.CTkToplevel):
         self.rgb_color = [r, g, b]
 
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-        print(self.rgb_color)
-        print(self.default_hex_color)
+        # print(self.rgb_color)
+        # print(self.default_hex_color)
 
         self.slider.configure(progress_color=self.default_hex_color)
         self.label.configure(fg_color=self.default_hex_color)
 
+        # Controls the label text
         self.label.configure(text=str(self.default_hex_color))
+        self.textbox.set_content_to(self.default_hex_color)
 
         if self.brightness_slider_value.get() < 70:
             self.label.configure(text_color="white")
@@ -257,6 +262,49 @@ class AskColor(customtkinter.CTkToplevel):
                         return
 
         self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.target)
+
+    def set_color(self, color):
+        # print(color)
+        if color and color.startswith("#"):
+            try:
+                r, g, b = tuple(int(color.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
+            except ValueError:
+                return
+
+            # def color_dist(rgb1, rgb2):
+            #     """ d = {} distance between two colors(3) """
+            #     rm = 0.5 * (rgb1[0] + rgb2[0])
+            #     d = sum((2 + rm, 4, 3 - rm) * (rgb1 - rgb2) ** 2) ** 0.5
+            #     return d
+
+            # self.default_hex_color = color
+            for i in range(0, self.image_dimension):
+                for j in range(0, self.image_dimension):
+                    self.rgb_color = self.img1.getpixel((i, j))
+                    # if color_dist(self.rgb_color, [r, g, b]) < 2:
+                    #     self.target_x = i
+                    #     self.target_y = j
+                    #     break
+
+            #
+            # self.canvas.delete("all")
+            # self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
+            #
+            # d_from_center = math.sqrt(
+            #     ((self.image_dimension / 2) - self.target_x) ** 2 + ((self.image_dimension / 2) - self.target_y) ** 2)
+            #
+            # if d_from_center < self.image_dimension / 2:
+            #     self.target_x, self.target_y = self.target_x, self.target_y
+            # else:
+            #     self.target_x, self.target_y = self.projection_on_circle(self.target_x, self.target_y,
+            #                                                              self.image_dimension / 2,
+            #                                                              self.image_dimension / 2,
+            #                                                              self.image_dimension / 2 - 1)
+            #
+            # self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+            #
+            # self.get_target_color()
+            # self.update_colors()
 
 
 if __name__ == "__main__":
