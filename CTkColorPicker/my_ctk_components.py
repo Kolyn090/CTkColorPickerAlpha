@@ -104,6 +104,7 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
             curr_content = self.get('1.0', "end-1c")
             code = curr_content.ljust(9, 'f')
             self.set_color(code)
+            print("change color to " + code)
 
         validify_content()
         change_palette_color()

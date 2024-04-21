@@ -8,6 +8,8 @@ from PIL import Image, ImageTk
 import os
 import math
 from my_ctk_components import HexCustomCTkTextbox
+from my_util import rgb_to_hsv
+from my_util import hsv_to_rgb
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -125,7 +127,7 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent', bg_color='transparent')
 
-        self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT*0.05),
+        self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
                                             width=int(WIDTH * 0.5), fg_color=self.default_hex_color,
                                             corner_radius=self.corner_radius, text=self.default_hex_color)
         self.label.pack(fill="both", padx=10, pady=5, side='left')
@@ -206,6 +208,7 @@ class AskColor(customtkinter.CTkToplevel):
 
     def update_colors(self):
         brightness = self.brightness_slider_value.get()
+        # print(self.brightness_slider_value.get())
 
         self.get_target_color()
 
@@ -216,8 +219,42 @@ class AskColor(customtkinter.CTkToplevel):
         self.rgb_color = [r, g, b]
 
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-        # print(self.rgb_color)
-        # print(self.default_hex_color)
+
+        self.slider.configure(progress_color=self.default_hex_color)
+        self.label.configure(fg_color=self.default_hex_color)
+
+        # Controls the label text
+        self.label.configure(text=str(self.default_hex_color))
+        self.textbox.set_content_to(self.default_hex_color)
+
+        if self.brightness_slider_value.get() < 70:
+            self.label.configure(text_color="white")
+        else:
+            self.label.configure(text_color="black")
+
+        if str(self.label._fg_color) == "black":
+            self.label.configure(text_color="white")
+
+    def update_colors2(self, code):
+        # brightness = self.brightness_slider_value.get()
+        # print(self.brightness_slider_value.get())
+
+        # r = int(self.rgb_color[0] * (brightness / 255))
+        # g = int(self.rgb_color[1] * (brightness / 255))
+        # b = int(self.rgb_color[2] * (brightness / 255))
+
+        r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
+        hsv = rgb_to_hsv(r, g, b)
+        brightness = hsv[2] * 255 / 100
+        # r = int(r * (brightness / 255))
+        # g = int(g * (brightness / 255))
+        # b = int(b * (brightness / 255))
+
+
+        self.rgb_color = [r, g, b]
+        print(code)
+
+        self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
 
         self.slider.configure(progress_color=self.default_hex_color)
         self.label.configure(fg_color=self.default_hex_color)
@@ -263,48 +300,64 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.target)
 
-    def set_color(self, color):
+    def color_dist(self, rgb1, rgb2):
+        rmean = (rgb1[0] + rgb2[0]) / 2
+        r = rgb1[0] - rgb2[0]
+        g = rgb1[1] - rgb2[1]
+        b = rgb1[2] - rgb2[2]
+        return (((512 + rmean) * r * r) / 256 + 4 * g * g + ((767 - rmean) * b * b) / 256) ** 0.5
+
+    def set_color(self, code):
         # print(color)
-        if color and color.startswith("#"):
+        if code and code.startswith("#"):
             try:
-                r, g, b = tuple(int(color.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
+                r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
             except ValueError:
                 return
 
-            # def color_dist(rgb1, rgb2):
-            #     """ d = {} distance between two colors(3) """
-            #     rm = 0.5 * (rgb1[0] + rgb2[0])
-            #     d = sum((2 + rm, 4, 3 - rm) * (rgb1 - rgb2) ** 2) ** 0.5
-            #     return d
+            self.update_colors2(code)
+
+            def refresh():
+                self.canvas.delete("all")
+                self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
+
+                d_from_center = math.sqrt(
+                    ((self.image_dimension / 2) - self.target_x) ** 2 + (
+                            (self.image_dimension / 2) - self.target_y) ** 2)
+
+                if d_from_center < self.image_dimension / 2:
+                    self.target_x, self.target_y = self.target_x, self.target_y
+                else:
+                    self.target_x, self.target_y = self.projection_on_circle(self.target_x, self.target_y,
+                                                                             self.image_dimension / 2,
+                                                                             self.image_dimension / 2,
+                                                                             self.image_dimension / 2 - 1)
+
+                self.canvas.create_image(self.target_x, self.target_y, image=self.target)
+
+                # self.get_target_color()
+                # self.update_colors()
 
             # self.default_hex_color = color
             for i in range(0, self.image_dimension):
                 for j in range(0, self.image_dimension):
                     self.rgb_color = self.img1.getpixel((i, j))
-                    # if color_dist(self.rgb_color, [r, g, b]) < 2:
-                    #     self.target_x = i
-                    #     self.target_y = j
-                    #     break
+                    # print([r, g, b])
+                    # print([i, j])
+                    # print(self.rgb_color[0:3])
+                    # luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
+                    # This is the shading value
+                    # print(r * luma / 255, g * luma / 255, b * luma / 255)
+                    # print(rgb_to_hsv(r, g, b))
 
-            #
-            # self.canvas.delete("all")
-            # self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
-            #
-            # d_from_center = math.sqrt(
-            #     ((self.image_dimension / 2) - self.target_x) ** 2 + ((self.image_dimension / 2) - self.target_y) ** 2)
-            #
-            # if d_from_center < self.image_dimension / 2:
-            #     self.target_x, self.target_y = self.target_x, self.target_y
-            # else:
-            #     self.target_x, self.target_y = self.projection_on_circle(self.target_x, self.target_y,
-            #                                                              self.image_dimension / 2,
-            #                                                              self.image_dimension / 2,
-            #                                                              self.image_dimension / 2 - 1)
-            #
-            # self.canvas.create_image(self.target_x, self.target_y, image=self.target)
-            #
-            # self.get_target_color()
-            # self.update_colors()
+                    if self.color_dist(self.rgb_color[0:3], [r, g, b]) < 3:
+                        self.target_x = i
+                        self.target_y = j
+                        refresh()
+                        # print([r, g, b])
+                        # luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
+                        # print(luma)
+                        break
 
 
 if __name__ == "__main__":
