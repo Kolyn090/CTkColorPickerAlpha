@@ -9,7 +9,7 @@ import os
 import math
 from my_ctk_components import HexCustomCTkTextbox
 from my_util import rgb_to_hsv
-from my_util import hsv_to_rgb
+from my_util import convert_to_value_100_rgb
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -245,14 +245,12 @@ class AskColor(customtkinter.CTkToplevel):
 
         r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
         hsv = rgb_to_hsv(r, g, b)
-        brightness = hsv[2] * 255 / 100
-        # r = int(r * (brightness / 255))
-        # g = int(g * (brightness / 255))
-        # b = int(b * (brightness / 255))
-
+        # print(r, g, b)
+        # print(hsv[2] * 255 / 100)
+        self.brightness_slider_value.set(hsv[2] * 255 / 100)
 
         self.rgb_color = [r, g, b]
-        print(code)
+        # print(code)
 
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
 
@@ -349,8 +347,8 @@ class AskColor(customtkinter.CTkToplevel):
                     # This is the shading value
                     # print(r * luma / 255, g * luma / 255, b * luma / 255)
                     # print(rgb_to_hsv(r, g, b))
-
-                    if self.color_dist(self.rgb_color[0:3], [r, g, b]) < 3:
+                    #print(convert_to_value_100_rgb(r, g, b))
+                    if self.color_dist(self.rgb_color[0:3], convert_to_value_100_rgb(r, g, b)) < 3:
                         self.target_x = i
                         self.target_y = j
                         refresh()

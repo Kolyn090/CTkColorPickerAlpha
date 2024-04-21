@@ -7,7 +7,7 @@ def rgb_to_hsv(r, g, b):
     minc = min(r, g, b)
     v = maxc
     if minc == maxc:
-        return 0.0, 0.0, v
+        return 0.0, 0.0, round(v*100)
     s = (maxc - minc) / maxc
     rc = (maxc - r) / (maxc - minc)
     gc = (maxc - g) / (maxc - minc)
@@ -53,3 +53,8 @@ def hsv_to_rgb(h, s, v):
             return [v, w, q]
     else:
         return [v, v, v]
+
+
+def convert_to_value_100_rgb(r, g, b):
+    hsv = rgb_to_hsv(r, g, b)
+    return hsv_to_rgb(hsv[0]/360, hsv[1]/100, 1)
