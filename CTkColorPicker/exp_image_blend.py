@@ -1,4 +1,5 @@
 import tkinter
+import customtkinter
 from PIL import Image, ImageTk
 import numpy
 from my_ctk_components import HexCustomCTkTextbox
@@ -28,6 +29,7 @@ red = [255, 0, 0]
 strength = 0.5
 
 pic = Image.open('transparent_background-2.png')
+print(pic)
 pix = numpy.array(pic)
 pix = numpy.array([blended_color(xi, red, strength) for xi in pix]).astype(numpy.uint8)
 pix = resize_array(pix)
@@ -40,6 +42,13 @@ base_width = 500
 
 root = tkinter.Tk()
 root.geometry(f"{base_width}x{base_height}")
+
+# --- Convert to CTK label image ---
+ctk_img = Image.fromarray(pix)
+button_image = customtkinter.CTkImage(ctk_img, size=(ctk_img.width, ctk_img.height))
+my_img = customtkinter.CTkLabel(master=root, image=button_image, text="")
+my_img.pack()
+# --- Convert to CTK label image ---
 
 img = ImageTk.PhotoImage(image=Image.fromarray(pix))
 canvas = tkinter.Canvas(root)

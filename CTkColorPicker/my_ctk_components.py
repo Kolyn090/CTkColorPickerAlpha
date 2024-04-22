@@ -1,6 +1,7 @@
 import string
-
 import customtkinter
+from PIL import Image, ImageTk
+import numpy
 
 
 class HexCustomCTkTextbox(customtkinter.CTkTextbox):
@@ -22,6 +23,7 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
     | hex code from textfield. Handles invalid inputs both from
     | typing and pasting. All lower case.
     """
+
     def __init__(self, set_color, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_color = set_color
@@ -79,13 +81,13 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
                 s_ = curr_content.translate(table)
                 s = curr_content.translate(str.maketrans(dict.fromkeys(s_)))
                 if len(curr_content) == 0 or curr_content[:1] != '#':
-                    s = '#'+s
+                    s = '#' + s
                 curr_content = s
                 self.set_content_to(curr_content.lower())
 
             # 2. the storing content always starts with a hashtag
             if len(curr_content) == 0 or curr_content[:1] != '#':
-                curr_content = '#'+curr_content
+                curr_content = '#' + curr_content
                 self.set_content_to(curr_content.lower())
 
             # 3. the storing content must be one line
@@ -129,3 +131,18 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
         # if not, fill the missing ones with 'f'
         curr_content = curr_content.ljust(9, 'f')
         self.set_content_to(curr_content)
+
+
+'''
+When triggered, should update 'image color'
+'''
+
+
+class ColorPreviewer(customtkinter.CTkLabel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        pic = Image.open('transparent_background-2.png')
+        pix = numpy.array(pic)
+        self.trans_bg_arr = Image.fromarray(pix)
+        self.configure(image=customtkinter.CTkImage(self.trans_bg_arr, size=self.trans_bg_arr.size),
+                       text="")

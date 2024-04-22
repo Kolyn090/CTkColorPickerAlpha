@@ -8,6 +8,7 @@ from PIL import Image, ImageTk
 import os
 import math
 from my_ctk_components import HexCustomCTkTextbox
+from my_ctk_components import ColorPreviewer
 from my_util import rgb_to_hsv
 from my_util import convert_to_value_100_rgb
 
@@ -114,7 +115,8 @@ class AskColor(customtkinter.CTkToplevel):
 
         # ------
         self.alpha_slider = customtkinter.CTkSlider(master=self.frame, height=20, border_width=self.slider_border,
-                                                    button_length=15, progress_color=self.default_hex_color, from_=0, to=255,
+                                                    button_length=15, progress_color=self.default_hex_color,
+                                                    from_=0, to=255,
                                                     variable=self.alpha_slider_value, number_of_steps=256,
                                                     button_corner_radius=self.corner_radius,
                                                     corner_radius=self.corner_radius,
@@ -123,8 +125,10 @@ class AskColor(customtkinter.CTkToplevel):
                                                     command=None, bg_color='transparent',
                                                     border_color='transparent')
         self.alpha_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
-
         # ------
+
+        # self.previewer = ColorPreviewer(master=self.frame)
+        # self.previewer.pack()
 
         self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent', bg_color='transparent')
 
