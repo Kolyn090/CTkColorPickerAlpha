@@ -66,6 +66,10 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
             |    4. the string content cannot exceed 9 characters
             :return: Void
             """
+
+            # Save the current text cursor position
+            cursor_pos = self.index(customtkinter.INSERT).split(".")[1]
+
             # 1. each character in the content must be hex ('0' - 'f')
             #    except the first hashtag. Delete any character that is not
             #    ('0' - 'f') except the first hashtag
@@ -94,6 +98,9 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
                 curr_content = curr_content[0:9]
                 self.set_content_to(curr_content.lower())
 
+            # Revert the cursor position
+            self.mark_set("insert", "%d.%d" % (1, int(cursor_pos)))
+
         def change_palette_color():
             """
             |  Convert content to code and change the color of palette to code.
@@ -104,7 +111,7 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
             curr_content = self.get('1.0', "end-1c")
             code = curr_content.ljust(9, 'f')
             self.set_color(code)
-            print("change color to " + code)
+            # print("change color to " + code)
 
         validify_content()
         change_palette_color()

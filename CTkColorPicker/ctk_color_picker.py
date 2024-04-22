@@ -32,6 +32,7 @@ class AskColor(customtkinter.CTkToplevel):
         super().__init__()
 
         self._color = "#FFFFFF"
+        self.curr_code = "#FFFFFF"
         self.title(title)
         WIDTH = width if width >= 200 else 200
         HEIGHT = WIDTH + 200
@@ -299,15 +300,7 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.target)
 
-    def color_dist(self, rgb1, rgb2):
-        rmean = (rgb1[0] + rgb2[0]) / 2
-        r = rgb1[0] - rgb2[0]
-        g = rgb1[1] - rgb2[1]
-        b = rgb1[2] - rgb2[2]
-        return (((512 + rmean) * r * r) / 256 + 4 * g * g + ((767 - rmean) * b * b) / 256) ** 0.5
-
     def set_color(self, code):
-        # print(color)
         if code and code.startswith("#"):
             try:
                 r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
@@ -315,6 +308,13 @@ class AskColor(customtkinter.CTkToplevel):
                 return
 
             self.update_colors2(code)
+
+            def color_dist(rgb1, rgb2):
+                rmean = (rgb1[0] + rgb2[0]) / 2
+                r = rgb1[0] - rgb2[0]
+                g = rgb1[1] - rgb2[1]
+                b = rgb1[2] - rgb2[2]
+                return (((512 + rmean) * r * r) / 256 + 4 * g * g + ((767 - rmean) * b * b) / 256) ** 0.5
 
             def refresh():
                 self.canvas.delete("all")
@@ -337,6 +337,17 @@ class AskColor(customtkinter.CTkToplevel):
                 # self.get_target_color()
                 # self.update_colors()
 
+            if code.startswith(self.curr_code.lower()):
+                return
+            self.curr_code = code
+
+            # edge case
+            if code.startswith("#ffffff"):
+                self.target_x = self.image_dimension / 2
+                self.target_y = self.image_dimension / 2
+                refresh()
+                return
+
             # self.default_hex_color = color
             for i in range(0, self.image_dimension):
                 for j in range(0, self.image_dimension):
@@ -348,8 +359,8 @@ class AskColor(customtkinter.CTkToplevel):
                     # This is the shading value
                     # print(r * luma / 255, g * luma / 255, b * luma / 255)
                     # print(rgb_to_hsv(r, g, b))
-                    #print(convert_to_value_100_rgb(r, g, b))
-                    if self.color_dist(self.rgb_color[0:3], convert_to_value_100_rgb(r, g, b)) < 3:
+                    # print(convert_to_value_100_rgb(r, g, b))
+                    if color_dist(self.rgb_color[0:3], convert_to_value_100_rgb(r, g, b)) < 3:
                         self.target_x = i
                         self.target_y = j
                         refresh()
