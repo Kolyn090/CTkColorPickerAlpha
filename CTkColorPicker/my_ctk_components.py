@@ -1,6 +1,6 @@
 import string
 import customtkinter
-from PIL import Image, ImageTk
+from PIL import Image
 import numpy
 
 
@@ -141,8 +141,45 @@ When triggered, should update 'image color'
 class ColorPreviewer(customtkinter.CTkLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        pic = Image.open('transparent_background-2.png')
-        pix = numpy.array(pic)
-        self.trans_bg_arr = Image.fromarray(pix)
-        self.configure(image=customtkinter.CTkImage(self.trans_bg_arr, size=self.trans_bg_arr.size),
+
+        def make_default_trans_bg_arr():
+            def resize_array(arr):
+                return arr.repeat(2, axis=0).repeat(2, axis=1)
+
+            pic = Image.open('transparent_background-2.png')
+            result = numpy.array(pic)
+            result = resize_array(result)
+            result = resize_array(result)
+            result = resize_array(result)
+            result = resize_array(result)
+
+            return result
+
+        self.pix = make_default_trans_bg_arr()
+        trans_bg_img = Image.fromarray(self.pix)
+        self.configure(image=customtkinter.CTkImage(trans_bg_img, size=trans_bg_img.size),
+                       text="")
+
+    def render_with_hex(self, hex_code, a):
+        if hex_code and hex_code.startswith("#"):
+            try:
+                r, g, b = tuple(int(hex_code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
+                self.render_with(r, g, b, a)
+            except ValueError:
+                return
+
+    def render_with(self, r, g, b, a):
+        def blended_color(source, target, m_strength):
+            def blend_element(e):
+                return [round((1 - m_strength) * e[0] + m_strength * target[0]),
+                        round((1 - m_strength) * e[1] + m_strength * target[1]),
+                        round((1 - m_strength) * e[2] + m_strength * target[2]),
+                        255]
+
+            return numpy.array([blend_element(si) for si in source])
+
+        re_render_arr = numpy.array([blended_color(xi, [r, g, b], a/255) for xi in self.pix]).astype(numpy.uint8)
+        re_render_img = Image.fromarray(re_render_arr)
+
+        self.configure(image=customtkinter.CTkImage(re_render_img, size=re_render_img.size),
                        text="")

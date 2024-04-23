@@ -18,7 +18,7 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 class AskColor(customtkinter.CTkToplevel):
 
     def __init__(self,
-                 width: int = 500,
+                 width: int = 300,
                  title: str = "Choose Color",
                  initial_color: str = None,
                  bg_color: str = None,
@@ -35,7 +35,7 @@ class AskColor(customtkinter.CTkToplevel):
         self._color = "#FFFFFF"
         self.curr_code = "#FFFFFF"
         self.title(title)
-        WIDTH = width if width >= 200 else 200
+        WIDTH = width if width >= 300 else 300
         HEIGHT = WIDTH + 200
         self.image_dimension = self._apply_window_scaling(WIDTH - 100)
         self.target_dimension = self._apply_window_scaling(20)
@@ -127,42 +127,45 @@ class AskColor(customtkinter.CTkToplevel):
         self.alpha_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
         # ------
 
-        # self.previewer = ColorPreviewer(master=self.frame)
-        # self.previewer.pack()
+        self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
 
-        self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent', bg_color='transparent')
+        self.previewer = ColorPreviewer(master=self.stack1, corner_radius=self.corner_radius)
+        self.previewer.pack(fill="both", padx=0, pady=5, side='left')
+        self.previewer.render_with(0, 255, 0, 127)
 
-        self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
-                                            width=int(WIDTH * 0.5), fg_color=self.default_hex_color,
-                                            corner_radius=self.corner_radius, text=self.default_hex_color)
-        self.label.pack(fill="both", padx=10, pady=5, side='left')
+        # self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
+        #                                     width=int(WIDTH * 0.5), fg_color=self.default_hex_color,
+        #                                     corner_radius=self.corner_radius, text=self.default_hex_color)
+        # self.label.pack(fill="both", padx=10, pady=5, side='left')
 
-        self.textbox = HexCustomCTkTextbox(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
-                                           set_color=self.set_color,
-                                           fg_color=self.default_hex_color,
-                                           corner_radius=self.corner_radius)
-        self.textbox.pack(fill="both", padx=10, pady=5, side='right')
-        self.textbox.insert("end-1c", "#")
+        self.hex_textbox = HexCustomCTkTextbox(master=self.stack1,
+                                               set_color=self.set_color,
+                                               fg_color=self.default_hex_color,
+                                               text_color='#000000',
+                                               corner_radius=self.corner_radius)
+        self.hex_textbox.pack(fill="both", padx=0, pady=5, side='right')
+        self.hex_textbox.insert("end-1c", "#")
 
-        self.stack1.pack(fill="both")
+        self.ok_button = customtkinter.CTkButton(master=self.frame, text=self.button_text,
+                                                 height=50,
+                                                 corner_radius=self.corner_radius, fg_color=self.button_color,
+                                                 hover_color=self.button_hover_color, command=self._ok_event,
+                                                 **button_kwargs)
+        self.ok_button.pack(fill="both", padx=5, pady=10, side='bottom')
 
-        self.button = customtkinter.CTkButton(master=self.frame, text=self.button_text, height=int(HEIGHT * 0.1),
-                                              corner_radius=self.corner_radius, fg_color=self.button_color,
-                                              hover_color=self.button_hover_color, command=self._ok_event,
-                                              **button_kwargs)
-        self.button.pack(fill="both", padx=10, pady=5)
+        self.stack1.pack(fill="both", pady=0)
 
-        self.after(150, lambda: self.label.focus())
+        # self.after(150, lambda: self.label.focus())
 
         self.grab_set()
 
     def get(self):
-        self._color = self.label._fg_color
+        self._color = self.curr_code
         self.master.wait_window(self)
         return self._color
 
     def _ok_event(self, event=None):
-        self._color = self.label._fg_color
+        self._color = self.curr_code
         self.grab_release()
         self.destroy()
         del self.img1
@@ -227,19 +230,20 @@ class AskColor(customtkinter.CTkToplevel):
         # self.default_hex_color = "#ffffff77"
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
-        self.label.configure(fg_color=self.default_hex_color)
+        # self.label.configure(fg_color=self.default_hex_color)
+        self.previewer.render_with_hex(self.default_hex_color, 255)
 
         # Controls the label text
-        self.label.configure(text=str(self.default_hex_color))
-        self.textbox.set_content_to(self.default_hex_color)
+        # self.label.configure(text=str(self.default_hex_color))
+        self.hex_textbox.set_content_to(self.default_hex_color)
 
-        if self.brightness_slider_value.get() < 70:
-            self.label.configure(text_color="white")
-        else:
-            self.label.configure(text_color="black")
-
-        if str(self.label._fg_color) == "black":
-            self.label.configure(text_color="white")
+        # if self.brightness_slider_value.get() < 70:
+        #     self.label.configure(text_color="white")
+        # else:
+        #     self.label.configure(text_color="black")
+        #
+        # if str(self.label._fg_color) == "black":
+        #     self.label.configure(text_color="white")
 
     def update_colors2(self, code):
         # brightness = self.brightness_slider_value.get()
@@ -261,19 +265,24 @@ class AskColor(customtkinter.CTkToplevel):
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
-        self.label.configure(fg_color=self.default_hex_color)
+        # self.label.configure(fg_color=self.default_hex_color)
+
+        def get_strength():
+            return int("0x" + code[7:], 0)
+
+        self.previewer.render_with_hex(self.default_hex_color, get_strength())
 
         # Controls the label text
-        self.label.configure(text=str(self.default_hex_color))
-        #self.textbox.set_content_to(self.default_hex_color)
+        # self.label.configure(text=str(self.default_hex_color))
+        # self.hex_textbox.set_content_to(self.default_hex_color)
 
-        if self.brightness_slider_value.get() < 70:
-            self.label.configure(text_color="white")
-        else:
-            self.label.configure(text_color="black")
+        # if self.brightness_slider_value.get() < 70:
+        #     self.label.configure(text_color="white")
+        # else:
+        #     self.label.configure(text_color="black")
 
-        if str(self.label._fg_color) == "black":
-            self.label.configure(text_color="white")
+        # if str(self.label._fg_color) == "black":
+        #     self.label.configure(text_color="white")
 
     @staticmethod
     def projection_on_circle(point_x, point_y, circle_x, circle_y, radius):
