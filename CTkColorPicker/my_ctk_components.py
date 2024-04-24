@@ -133,11 +133,6 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
         self.set_content_to(curr_content)
 
 
-'''
-When triggered, should update 'image color'
-'''
-
-
 class ColorPreviewer(customtkinter.CTkLabel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

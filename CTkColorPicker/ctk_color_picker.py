@@ -234,6 +234,15 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
         # self.label.configure(fg_color=self.default_hex_color)
+
+        def determine_alpha_slider_color_value():
+            color = hex(alpha)[2:]
+            if len(color) < 2:
+                color = "0" + color
+            return "#" + color + color + color
+
+        self.alpha_slider.configure(progress_color=determine_alpha_slider_color_value())
+
         self.previewer.render_with_hex(self.default_hex_color, alpha)
 
         # Controls the label text
@@ -279,7 +288,22 @@ class AskColor(customtkinter.CTkToplevel):
         def get_strength():
             return int("0x" + code[7:], 0)
 
+        def determine_alpha_slider_color():
+            color = code[7:]
+            if len(color) == 0:
+                color = "ff"
+            elif len(color) == 1:
+                color = "f" + color
+            return color
+
+        def determine_alpha_slider_color_value():
+            color = determine_alpha_slider_color()
+            return "#" + color + color + color
+
         self.previewer.render_with_hex(self.default_hex_color, get_strength())
+
+        self.alpha_slider.configure(progress_color=determine_alpha_slider_color_value())
+        self.alpha_slider_value.set(int("0x" + determine_alpha_slider_color(), 0))
 
         # Controls the label text
         # self.label.configure(text=str(self.default_hex_color))
