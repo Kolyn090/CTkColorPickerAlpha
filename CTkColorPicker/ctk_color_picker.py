@@ -102,9 +102,11 @@ class AskColor(customtkinter.CTkToplevel):
         self.brightness_slider_value.set(255)
 
         self.brightness_slider = customtkinter.CTkSlider(master=self.frame, height=20, border_width=self.slider_border,
-                                                         button_length=15, progress_color=self.default_hex_color, from_=0, to=255,
+                                                         button_length=15, progress_color=self.default_hex_color,
+                                                         from_=0, to=255,
                                                          variable=self.brightness_slider_value, number_of_steps=256,
-                                                         button_corner_radius=self.corner_radius, corner_radius=self.corner_radius,
+                                                         button_corner_radius=self.corner_radius,
+                                                         corner_radius=self.corner_radius,
                                                          button_color=self.button_color,
                                                          button_hover_color=self.button_hover_color,
                                                          command=lambda x: self.update_colors())
@@ -122,7 +124,7 @@ class AskColor(customtkinter.CTkToplevel):
                                                     corner_radius=self.corner_radius,
                                                     button_color=self.button_color,
                                                     button_hover_color=self.button_hover_color,
-                                                    command=None, bg_color='transparent',
+                                                    command=lambda x: self.update_colors(), bg_color='transparent',
                                                     border_color='transparent')
         self.alpha_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
         # ------
@@ -131,7 +133,7 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.previewer = ColorPreviewer(master=self.stack1, corner_radius=self.corner_radius)
         self.previewer.pack(fill="both", padx=0, pady=5, side='left')
-        self.previewer.render_with(0, 255, 0, 127)
+        self.previewer.render_with_hex(self.default_hex_color, 255)
 
         # self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
         #                                     width=int(WIDTH * 0.5), fg_color=self.default_hex_color,
@@ -216,6 +218,7 @@ class AskColor(customtkinter.CTkToplevel):
 
     def update_colors(self):
         brightness = self.brightness_slider_value.get()
+        alpha = self.alpha_slider_value.get()
         # print(self.brightness_slider_value.get())
 
         self.get_target_color()
@@ -231,11 +234,17 @@ class AskColor(customtkinter.CTkToplevel):
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
         # self.label.configure(fg_color=self.default_hex_color)
-        self.previewer.render_with_hex(self.default_hex_color, 255)
+        self.previewer.render_with_hex(self.default_hex_color, alpha)
 
         # Controls the label text
         # self.label.configure(text=str(self.default_hex_color))
-        self.hex_textbox.set_content_to(self.default_hex_color)
+        def get_alpha():
+            result = hex(alpha)[2:]
+            if len(result) < 2:
+                result = "0" + result
+            return result
+
+        self.hex_textbox.set_content_to(self.default_hex_color + get_alpha())
 
         # if self.brightness_slider_value.get() < 70:
         #     self.label.configure(text_color="white")
