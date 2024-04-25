@@ -3,6 +3,8 @@
 # Contributers: Victor Vimbert-Guerlais (helloHackYnow)
 
 import tkinter
+import random
+
 import customtkinter
 from PIL import Image, ImageTk
 import os
@@ -148,13 +150,23 @@ class AskColor(customtkinter.CTkToplevel):
         self.hex_textbox.pack(fill="both", padx=0, pady=5, side='right')
         self.hex_textbox.insert("end-1c", "#")
 
-        self.ok_button = customtkinter.CTkButton(master=self.frame, text=self.button_text,
+        self.stack2 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
+        self.stack2.pack(side="bottom")
+        self.ok_button = customtkinter.CTkButton(master=self.stack2, text=self.button_text,
                                                  height=50,
                                                  corner_radius=self.corner_radius, fg_color=self.button_color,
                                                  hover_color=self.button_hover_color, command=self._ok_event,
                                                  **button_kwargs)
-        self.ok_button.pack(fill="both", padx=5, pady=10, side='bottom')
+        self.ok_button.pack(fill="both", padx=5, pady=10, side='right')
 
+        self.random_button = customtkinter.CTkButton(master=self.stack2, text="Random",
+                                                     height=50,
+                                                     corner_radius=self.corner_radius, fg_color=self.button_color,
+                                                     hover_color=self.button_hover_color, command=self._random_event,
+                                                     **button_kwargs)
+        self.random_button.pack(fill="both", padx=5, pady=10, side='left')
+
+        self.stack2.pack(fill="both", pady=0)
         self.stack1.pack(fill="both", pady=0)
 
         # self.after(150, lambda: self.label.focus())
@@ -174,6 +186,23 @@ class AskColor(customtkinter.CTkToplevel):
         del self.img2
         del self.wheel
         del self.target
+
+    def _random_event(self, event=None):
+        def generate_random_color():
+            def random_hex_255():
+                result = hex(random.randint(0, 255))[2:]
+                if len(result) < 2:
+                    result = "0"+result
+                return result
+
+            return ("#" + random_hex_255() +
+                    random_hex_255() +
+                    random_hex_255() +
+                    random_hex_255())
+
+        new_color = generate_random_color()
+        self.set_color(new_color)
+        self.hex_textbox.set_content_to(new_color)
 
     def _on_closing(self):
         self._color = None
@@ -233,6 +262,7 @@ class AskColor(customtkinter.CTkToplevel):
         # self.default_hex_color = "#ffffff77"
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
+
         # self.label.configure(fg_color=self.default_hex_color)
 
         def determine_alpha_slider_color_value():
@@ -283,6 +313,7 @@ class AskColor(customtkinter.CTkToplevel):
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
 
         self.brightness_slider.configure(progress_color=self.default_hex_color)
+
         # self.label.configure(fg_color=self.default_hex_color)
 
         def get_strength():
