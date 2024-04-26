@@ -30,12 +30,15 @@ class AskColor(customtkinter.CTkToplevel):
                  text: str = "OK",
                  corner_radius: int = 24,
                  slider_border: int = 1,
+                 enable_alpha_slider: bool = True,
+                 enable_previewer: bool = True,
+                 enable_alpha: bool = False,  # when False, disable alpha_slider as well
+                 allow_hexcode_modification: bool = True,
+                 enable_random_button: bool = True,
                  **button_kwargs):
 
         super().__init__()
 
-        self._color = "#FFFFFF"
-        self.curr_code = "#FFFFFF"
         self.title(title)
         WIDTH = width if width >= 300 else 300
         HEIGHT = WIDTH + 200
@@ -43,7 +46,6 @@ class AskColor(customtkinter.CTkToplevel):
         self.target_dimension = self._apply_window_scaling(20)
         self.target_y = self.image_dimension / 2
         self.target_x = self.image_dimension / 2
-
         self.maxsize(WIDTH, HEIGHT)
         self.minsize(WIDTH, HEIGHT)
         self.resizable(width=False, height=False)
@@ -53,22 +55,22 @@ class AskColor(customtkinter.CTkToplevel):
         self.grid_rowconfigure(0, weight=1)
         self.after(10)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
+
+        self.enable_alpha = enable_alpha
+        self._color = "#ffffffff" if enable_alpha else "#ffffff"
+        self.curr_code = "#ffffffff" if enable_alpha else "#ffffff"
         self.default_hex_color = "#ffffff"
         self.default_rgb = [255, 255, 255]
         self.rgb_color = self.default_rgb[:]
 
         def choose_from(default_color, custom_color):
             return default_color if custom_color is None else custom_color
-
         self.bg_color = self._apply_appearance_mode(
             choose_from(customtkinter.ThemeManager.theme["CTkFrame"]["fg_color"], bg_color))
-
         self.fg_color = self._apply_appearance_mode(
             choose_from(customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"], fg_color))
-
         self.button_color = self._apply_appearance_mode(
             choose_from(customtkinter.ThemeManager.theme["CTkButton"]["fg_color"], button_color))
-
         self.button_hover_color = self._apply_appearance_mode(
             choose_from(customtkinter.ThemeManager.theme["CTkButton"]["hover_color"], button_hover_color))
 
@@ -76,28 +78,23 @@ class AskColor(customtkinter.CTkToplevel):
         self.ok_button_text = text
         self.corner_radius = corner_radius
         self.slider_border = 10 if slider_border >= 10 else slider_border
-
         self.frame = customtkinter.CTkFrame(master=self, fg_color=self.fg_color, bg_color=self.bg_color)
         self.frame.grid(padx=20, pady=20, sticky="nswe")
-
         self.canvas = tkinter.Canvas(self.frame, height=self.image_dimension, width=self.image_dimension,
                                      highlightthickness=0, bg=self.fg_color)
         self.canvas.pack(pady=20)
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
-        def open_image(image_name, dimension):
-            return Image.open(os.path.join(PATH, image_name)).resize(
-                (dimension, dimension), Image.Resampling.LANCZOS)
+        def open_image(img_name, d):
+            return Image.open(os.path.join(PATH, img_name)).resize((d, d), Image.Resampling.LANCZOS)
         self.img1 = open_image('color_wheel.png', self.image_dimension)
         self.img2 = open_image('target.png', self.target_dimension)
         self.wheel = ImageTk.PhotoImage(self.img1)
         self.target = ImageTk.PhotoImage(self.img2)
+        self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
+        self.set_initial_color(initial_color)
         self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
         self.stack2 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
-
-        def initialize_app():
-            self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
-            self.set_initial_color(initial_color)
 
         def create_brightness_slider_and_value(parent):
             brightness_slider_value = customtkinter.IntVar()
@@ -165,15 +162,26 @@ class AskColor(customtkinter.CTkToplevel):
             return ok_button
 
         # --- Here is where all essential components are created ---
-        initialize_app()
         (self.brightness_slider, self.brightness_slider_value) = create_brightness_slider_and_value(self.frame)
         (self.alpha_slider, self.alpha_slider_value) = create_alpha_slider_and_value(self.frame)
-
         self.previewer = create_color_previewer(self.stack1)
         self.hex_textbox = create_hex_textbox(self.stack1)
         self.random_button = create_random_button(self.stack2)
         self.ok_button = create_ok_button(self.stack2)
         # --- Here is where all essential components are created ---
+
+        if not enable_alpha_slider:
+            self.alpha_slider.pack_forget()
+            self.hex_textbox.pack(pady=20)
+        if not self.enable_alpha:
+            self.alpha_slider.pack_forget()
+            self.hex_textbox.pack(pady=20)
+        if not enable_previewer:
+            self.previewer.pack_forget()
+            self.hex_textbox.pack(side="top")
+        if not enable_random_button:
+            self.random_button.pack_forget()
+            self.ok_button.pack(side="top")
 
         self.stack2.pack(fill="both", pady=0, side="bottom")
         self.stack1.pack(fill="both", pady=0)
