@@ -141,7 +141,7 @@ class ColorPreviewer(customtkinter.CTkLabel):
             def resize_array(arr):
                 return arr.repeat(2, axis=0).repeat(2, axis=1)
 
-            pic = Image.open('transparent_background-2.png')
+            pic = Image.open('transparent_background.png')
             result = numpy.array(pic)
             result = resize_array(result)
             result = resize_array(result)

@@ -28,7 +28,7 @@ def convert_to_proper_strength(val):
 red = [255, 0, 0]
 strength = 0.5
 
-pic = Image.open('transparent_background-2.png')
+pic = Image.open('transparent_background.png')
 print(pic)
 pix = numpy.array(pic)
 pix = numpy.array([blended_color(xi, red, strength) for xi in pix]).astype(numpy.uint8)

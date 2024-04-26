@@ -53,7 +53,6 @@ class AskColor(customtkinter.CTkToplevel):
         self.grid_rowconfigure(0, weight=1)
         self.after(10)
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
-
         self.default_hex_color = "#ffffff"
         self.default_rgb = [255, 255, 255]
         self.rgb_color = self.default_rgb[:]
@@ -73,11 +72,10 @@ class AskColor(customtkinter.CTkToplevel):
         self.button_hover_color = self._apply_appearance_mode(
             choose_from(customtkinter.ThemeManager.theme["CTkButton"]["hover_color"], button_hover_color))
 
-        self.button_text = text
+        self.config(bg=self.bg_color)
+        self.ok_button_text = text
         self.corner_radius = corner_radius
         self.slider_border = 10 if slider_border >= 10 else slider_border
-
-        self.config(bg=self.bg_color)
 
         self.frame = customtkinter.CTkFrame(master=self, fg_color=self.fg_color, bg_color=self.bg_color)
         self.frame.grid(padx=20, pady=20, sticky="nswe")
@@ -90,87 +88,95 @@ class AskColor(customtkinter.CTkToplevel):
         def open_image(image_name, dimension):
             return Image.open(os.path.join(PATH, image_name)).resize(
                 (dimension, dimension), Image.Resampling.LANCZOS)
-
         self.img1 = open_image('color_wheel.png', self.image_dimension)
         self.img2 = open_image('target.png', self.target_dimension)
-
         self.wheel = ImageTk.PhotoImage(self.img1)
         self.target = ImageTk.PhotoImage(self.img2)
-
-        self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
-        self.set_initial_color(initial_color)
-
-        self.brightness_slider_value = customtkinter.IntVar()
-        self.brightness_slider_value.set(255)
-
-        self.brightness_slider = customtkinter.CTkSlider(master=self.frame, height=20, border_width=self.slider_border,
-                                                         button_length=15, progress_color=self.default_hex_color,
-                                                         from_=0, to=255,
-                                                         variable=self.brightness_slider_value, number_of_steps=256,
-                                                         button_corner_radius=self.corner_radius,
-                                                         corner_radius=self.corner_radius,
-                                                         button_color=self.button_color,
-                                                         button_hover_color=self.button_hover_color,
-                                                         command=lambda x: self.update_colors())
-        self.brightness_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
-
-        self.alpha_slider_value = customtkinter.IntVar()
-        self.alpha_slider_value.set(255)
-
-        # ------
-        self.alpha_slider = customtkinter.CTkSlider(master=self.frame, height=20, border_width=self.slider_border,
-                                                    button_length=15, progress_color=self.default_hex_color,
-                                                    from_=0, to=255,
-                                                    variable=self.alpha_slider_value, number_of_steps=256,
-                                                    button_corner_radius=self.corner_radius,
-                                                    corner_radius=self.corner_radius,
-                                                    button_color=self.button_color,
-                                                    button_hover_color=self.button_hover_color,
-                                                    command=lambda x: self.update_colors(), bg_color='transparent',
-                                                    border_color='transparent')
-        self.alpha_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
-        # ------
-
         self.stack1 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
-
-        self.previewer = ColorPreviewer(master=self.stack1, corner_radius=self.corner_radius)
-        self.previewer.pack(fill="both", padx=0, pady=5, side='left')
-        self.previewer.render_with_hex(self.default_hex_color, 255)
-
-        # self.label = customtkinter.CTkLabel(master=self.stack1, text_color="#000000", height=int(HEIGHT * 0.05),
-        #                                     width=int(WIDTH * 0.5), fg_color=self.default_hex_color,
-        #                                     corner_radius=self.corner_radius, text=self.default_hex_color)
-        # self.label.pack(fill="both", padx=10, pady=5, side='left')
-
-        self.hex_textbox = HexCustomCTkTextbox(master=self.stack1,
-                                               set_color=self.set_color,
-                                               fg_color=self.default_hex_color,
-                                               text_color='#000000',
-                                               corner_radius=self.corner_radius)
-        self.hex_textbox.pack(fill="both", padx=0, pady=5, side='right')
-        self.hex_textbox.insert("end-1c", "#")
-
         self.stack2 = customtkinter.CTkFrame(master=self.frame, fg_color='transparent')
-        self.stack2.pack(side="bottom")
-        self.ok_button = customtkinter.CTkButton(master=self.stack2, text=self.button_text,
-                                                 height=50,
-                                                 corner_radius=self.corner_radius, fg_color=self.button_color,
-                                                 hover_color=self.button_hover_color, command=self._ok_event,
-                                                 **button_kwargs)
-        self.ok_button.pack(fill="both", padx=5, pady=10, side='right')
 
-        self.random_button = customtkinter.CTkButton(master=self.stack2, text="Random",
-                                                     height=50,
-                                                     corner_radius=self.corner_radius, fg_color=self.button_color,
-                                                     hover_color=self.button_hover_color, command=self._random_event,
-                                                     **button_kwargs)
-        self.random_button.pack(fill="both", padx=5, pady=10, side='left')
+        def initialize_app():
+            self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)
+            self.set_initial_color(initial_color)
 
-        self.stack2.pack(fill="both", pady=0)
+        def create_brightness_slider_and_value(parent):
+            brightness_slider_value = customtkinter.IntVar()
+            brightness_slider_value.set(255)
+            brightness_slider = customtkinter.CTkSlider(master=parent, height=20, border_width=self.slider_border,
+                                                        button_length=15, progress_color=self.default_hex_color,
+                                                        from_=0, to=255,
+                                                        variable=brightness_slider_value, number_of_steps=256,
+                                                        button_corner_radius=self.corner_radius,
+                                                        corner_radius=self.corner_radius,
+                                                        button_color=self.button_color,
+                                                        button_hover_color=self.button_hover_color,
+                                                        command=lambda x: self.update_colors())
+            brightness_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
+            return brightness_slider, brightness_slider_value
+
+        def create_alpha_slider_and_value(parent):
+            alpha_slider_value = customtkinter.IntVar()
+            alpha_slider_value.set(255)
+            alpha_slider = customtkinter.CTkSlider(master=parent, height=20, border_width=self.slider_border,
+                                                   button_length=15, progress_color=self.default_hex_color,
+                                                   from_=0, to=255,
+                                                   variable=alpha_slider_value, number_of_steps=256,
+                                                   button_corner_radius=self.corner_radius,
+                                                   corner_radius=self.corner_radius,
+                                                   button_color=self.button_color,
+                                                   button_hover_color=self.button_hover_color,
+                                                   command=lambda x: self.update_colors(), bg_color='transparent',
+                                                   border_color='transparent')
+            alpha_slider.pack(fill="both", pady=(0, 15), padx=20 - self.slider_border)
+            return alpha_slider, alpha_slider_value
+
+        def create_color_previewer(parent):
+            previewer = ColorPreviewer(master=parent, corner_radius=self.corner_radius)
+            previewer.pack(fill="both", padx=0, pady=5, side='left')
+            previewer.render_with_hex(self.default_hex_color, 255)
+            return previewer
+
+        def create_hex_textbox(parent):
+            hex_textbox = HexCustomCTkTextbox(master=parent,
+                                              set_color=self.set_color,
+                                              fg_color=self.default_hex_color,
+                                              text_color='#000000',
+                                              corner_radius=self.corner_radius)
+            hex_textbox.pack(fill="both", padx=0, pady=5, side='right')
+            hex_textbox.insert("end-1c", "#")
+            return hex_textbox
+
+        def create_random_button(parent):
+            random_button = customtkinter.CTkButton(master=parent, text="Random",
+                                                    height=50,
+                                                    corner_radius=self.corner_radius, fg_color=self.button_color,
+                                                    hover_color=self.button_hover_color, command=self._random_event,
+                                                    **button_kwargs)
+            random_button.pack(fill="both", padx=5, pady=10, side='left')
+            return random_button
+
+        def create_ok_button(parent):
+            ok_button = customtkinter.CTkButton(master=parent, text=self.ok_button_text,
+                                                height=50,
+                                                corner_radius=self.corner_radius, fg_color=self.button_color,
+                                                hover_color=self.button_hover_color, command=self._ok_event,
+                                                **button_kwargs)
+            ok_button.pack(fill="both", padx=5, pady=10, side='right')
+            return ok_button
+
+        # --- Here is where all essential components are created ---
+        initialize_app()
+        (self.brightness_slider, self.brightness_slider_value) = create_brightness_slider_and_value(self.frame)
+        (self.alpha_slider, self.alpha_slider_value) = create_alpha_slider_and_value(self.frame)
+
+        self.previewer = create_color_previewer(self.stack1)
+        self.hex_textbox = create_hex_textbox(self.stack1)
+        self.random_button = create_random_button(self.stack2)
+        self.ok_button = create_ok_button(self.stack2)
+        # --- Here is where all essential components are created ---
+
+        self.stack2.pack(fill="both", pady=0, side="bottom")
         self.stack1.pack(fill="both", pady=0)
-
-        # self.after(150, lambda: self.label.focus())
-
         self.grab_set()
 
     def get(self):
@@ -192,7 +198,7 @@ class AskColor(customtkinter.CTkToplevel):
             def random_hex_255():
                 result = hex(random.randint(0, 255))[2:]
                 if len(result) < 2:
-                    result = "0"+result
+                    result = "0" + result
                 return result
 
             return ("#" + random_hex_255() +
