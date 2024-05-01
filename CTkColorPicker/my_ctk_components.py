@@ -24,13 +24,11 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
     | typing and pasting. All lower case.
     """
 
-    def __init__(self, set_color, *args, **kwargs):
+    def __init__(self, set_color, is_alpha=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.set_color = set_color
+        self.max_len = 9 if is_alpha else 7
         self.bind("<KeyRelease>", self.on_key_released)
-        # self.bind("<Motion>", self.on_focus_lost)
-        # self.bind("<Leave>", self.on_focus_lost)
-        # self.bind("<FocusOut>", self.on_focus_lost)
         my_font = customtkinter.CTkFont(family="Courier", size=12)
         self.configure(font=my_font)
 
@@ -65,7 +63,7 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
             |       except the first hashtag
             |    2. the storing content always starts with a hashtag
             |    3. the storing content must be one line
-            |    4. the string content cannot exceed 9 characters
+            |    4. the string content cannot exceed max_len characters
             :return: Void
             """
 
@@ -95,9 +93,9 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
                 curr_content = curr_content.split("\n")[0]
                 self.set_content_to(curr_content.lower())
 
-            # 4. the string content cannot exceed 9 characters
-            if len(curr_content) > 9:
-                curr_content = curr_content[0:9]
+            # 4. the string content cannot exceed max_len characters
+            if len(curr_content) > self.max_len:
+                curr_content = curr_content[0:self.max_len]
                 self.set_content_to(curr_content.lower())
 
             # Revert the cursor position
@@ -111,7 +109,7 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
             :return: Void
             """
             curr_content = self.get('1.0', "end-1c")
-            code = curr_content.ljust(9, 'f')
+            code = curr_content.ljust(self.max_len, 'f')
             self.set_color(code)
             # print("change color to " + code)
 
@@ -127,9 +125,9 @@ class HexCustomCTkTextbox(customtkinter.CTkTextbox):
         :return: Void
         """
         curr_content = self.get('1.0', "end-1c")
-        # content must have 9 characters
+        # content must have max_len characters
         # if not, fill the missing ones with 'f'
-        curr_content = curr_content.ljust(9, 'f')
+        curr_content = curr_content.ljust(self.max_len, 'f')
         self.set_content_to(curr_content)
 
 

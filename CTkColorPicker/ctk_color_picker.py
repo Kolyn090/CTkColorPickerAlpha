@@ -30,9 +30,8 @@ class AskColor(customtkinter.CTkToplevel):
                  text: str = "OK",
                  corner_radius: int = 24,
                  slider_border: int = 1,
-                 enable_alpha_slider: bool = True,
                  enable_previewer: bool = True,
-                 enable_alpha: bool = False,  # when False, disable alpha_slider as well
+                 enable_alpha: bool = True,
                  allow_hexcode_modification: bool = True,
                  enable_random_button: bool = True,
                  **button_kwargs):
@@ -57,9 +56,9 @@ class AskColor(customtkinter.CTkToplevel):
         self.protocol("WM_DELETE_WINDOW", self._on_closing)
 
         self.enable_alpha = enable_alpha
-        self._color = "#ffffffff" if enable_alpha else "#ffffff"
+        self.allow_hexcode_modification = allow_hexcode_modification
         self.curr_code = "#ffffffff" if enable_alpha else "#ffffff"
-        self.default_hex_color = "#ffffff"
+        self.default_hex_color = "#ffffffff" if enable_alpha else "#ffffff"
         self.default_rgb = [255, 255, 255]
         self.rgb_color = self.default_rgb[:]
 
@@ -100,7 +99,7 @@ class AskColor(customtkinter.CTkToplevel):
             brightness_slider_value = customtkinter.IntVar()
             brightness_slider_value.set(255)
             brightness_slider = customtkinter.CTkSlider(master=parent, height=20, border_width=self.slider_border,
-                                                        button_length=15, progress_color=self.default_hex_color,
+                                                        button_length=15, progress_color=self.default_hex_color[:7],
                                                         from_=0, to=255,
                                                         variable=brightness_slider_value, number_of_steps=256,
                                                         button_corner_radius=self.corner_radius,
@@ -115,7 +114,7 @@ class AskColor(customtkinter.CTkToplevel):
             alpha_slider_value = customtkinter.IntVar()
             alpha_slider_value.set(255)
             alpha_slider = customtkinter.CTkSlider(master=parent, height=20, border_width=self.slider_border,
-                                                   button_length=15, progress_color=self.default_hex_color,
+                                                   button_length=15, progress_color="#ffffff",
                                                    from_=0, to=255,
                                                    variable=alpha_slider_value, number_of_steps=256,
                                                    button_corner_radius=self.corner_radius,
@@ -136,11 +135,15 @@ class AskColor(customtkinter.CTkToplevel):
         def create_hex_textbox(parent):
             hex_textbox = HexCustomCTkTextbox(master=parent,
                                               set_color=self.set_color,
-                                              fg_color=self.default_hex_color,
+                                              is_alpha=enable_alpha,
+                                              fg_color=self.default_hex_color[:7],
                                               text_color='#000000',
                                               corner_radius=self.corner_radius)
             hex_textbox.pack(fill="both", padx=0, pady=5, side='right')
             hex_textbox.insert("end-1c", "#")
+            if not self.allow_hexcode_modification:
+                hex_textbox.configure(state='disable')
+
             return hex_textbox
 
         def create_random_button(parent):
@@ -170,9 +173,6 @@ class AskColor(customtkinter.CTkToplevel):
         self.ok_button = create_ok_button(self.stack2)
         # --- Here is where all essential components are created ---
 
-        if not enable_alpha_slider:
-            self.alpha_slider.pack_forget()
-            self.hex_textbox.pack(pady=20)
         if not self.enable_alpha:
             self.alpha_slider.pack_forget()
             self.hex_textbox.pack(pady=20)
@@ -183,17 +183,16 @@ class AskColor(customtkinter.CTkToplevel):
             self.random_button.pack_forget()
             self.ok_button.pack(side="top")
 
+        self.update_hexbox_label(self.default_hex_color)
         self.stack2.pack(fill="both", pady=0, side="bottom")
         self.stack1.pack(fill="both", pady=0)
         self.grab_set()
 
     def get(self):
-        self._color = self.curr_code
         self.master.wait_window(self)
-        return self._color
+        return self.curr_code
 
     def _ok_event(self, event=None):
-        self._color = self.curr_code
         self.grab_release()
         self.destroy()
         del self.img1
@@ -212,14 +211,14 @@ class AskColor(customtkinter.CTkToplevel):
             return ("#" + random_hex_255() +
                     random_hex_255() +
                     random_hex_255() +
-                    random_hex_255())
+                    (random_hex_255() if self.enable_alpha else ''))
 
         new_color = generate_random_color()
         self.set_color(new_color)
-        self.hex_textbox.set_content_to(new_color)
+        self.update_hexbox_label(new_color)
 
     def _on_closing(self):
-        self._color = None
+        self.curr_code = None
         self.grab_release()
         self.destroy()
         del self.img1
@@ -247,6 +246,14 @@ class AskColor(customtkinter.CTkToplevel):
         self.get_target_color()
         self.update_colors()
 
+    def update_hexbox_label(self, content):
+        if not self.allow_hexcode_modification:
+            self.hex_textbox.configure(state='normal')
+            self.hex_textbox.set_content_to(content)
+            self.hex_textbox.configure(state='disable')
+        else:
+            self.hex_textbox.set_content_to(content)
+
     def get_target_color(self):
         try:
             self.rgb_color = self.img1.getpixel((int(self.target_x), int(self.target_y)))
@@ -262,22 +269,13 @@ class AskColor(customtkinter.CTkToplevel):
     def update_colors(self):
         brightness = self.brightness_slider_value.get()
         alpha = self.alpha_slider_value.get()
-        # print(self.brightness_slider_value.get())
-
         self.get_target_color()
-
         r = int(self.rgb_color[0] * (brightness / 255))
         g = int(self.rgb_color[1] * (brightness / 255))
         b = int(self.rgb_color[2] * (brightness / 255))
-
         self.rgb_color = [r, g, b]
-
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-        # self.default_hex_color = "#ffffff77"
-
         self.brightness_slider.configure(progress_color=self.default_hex_color)
-
-        # self.label.configure(fg_color=self.default_hex_color)
 
         def determine_alpha_slider_color_value():
             color = hex(alpha)[2:]
@@ -286,49 +284,23 @@ class AskColor(customtkinter.CTkToplevel):
             return "#" + color + color + color
 
         self.alpha_slider.configure(progress_color=determine_alpha_slider_color_value())
-
         self.previewer.render_with_hex(self.default_hex_color, alpha)
 
-        # Controls the label text
-        # self.label.configure(text=str(self.default_hex_color))
         def get_alpha():
             result = hex(alpha)[2:]
             if len(result) < 2:
                 result = "0" + result
             return result
 
-        self.hex_textbox.set_content_to(self.default_hex_color + get_alpha())
-
-        # if self.brightness_slider_value.get() < 70:
-        #     self.label.configure(text_color="white")
-        # else:
-        #     self.label.configure(text_color="black")
-        #
-        # if str(self.label._fg_color) == "black":
-        #     self.label.configure(text_color="white")
+        self.update_hexbox_label(self.default_hex_color + (get_alpha() if self.enable_alpha else ''))
 
     def update_colors2(self, code):
-        # brightness = self.brightness_slider_value.get()
-        # print(self.brightness_slider_value.get())
-
-        # r = int(self.rgb_color[0] * (brightness / 255))
-        # g = int(self.rgb_color[1] * (brightness / 255))
-        # b = int(self.rgb_color[2] * (brightness / 255))
-
         r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
         hsv = rgb_to_hsv(r, g, b)
-        # print(r, g, b)
-        # print(hsv[2] * 255 / 100)
         self.brightness_slider_value.set(hsv[2] * 255 / 100)
-
         self.rgb_color = [r, g, b]
-        # print(code)
-
         self.default_hex_color = "#{:02x}{:02x}{:02x}".format(*self.rgb_color)
-
         self.brightness_slider.configure(progress_color=self.default_hex_color)
-
-        # self.label.configure(fg_color=self.default_hex_color)
 
         def get_strength():
             return int("0x" + code[7:], 0)
@@ -345,22 +317,11 @@ class AskColor(customtkinter.CTkToplevel):
             color = determine_alpha_slider_color()
             return "#" + color + color + color
 
-        self.previewer.render_with_hex(self.default_hex_color, get_strength())
+        self.previewer.render_with_hex(self.default_hex_color, get_strength() if self.enable_alpha else 255)
 
-        self.alpha_slider.configure(progress_color=determine_alpha_slider_color_value())
-        self.alpha_slider_value.set(int("0x" + determine_alpha_slider_color(), 0))
-
-        # Controls the label text
-        # self.label.configure(text=str(self.default_hex_color))
-        # self.hex_textbox.set_content_to(self.default_hex_color)
-
-        # if self.brightness_slider_value.get() < 70:
-        #     self.label.configure(text_color="white")
-        # else:
-        #     self.label.configure(text_color="black")
-
-        # if str(self.label._fg_color) == "black":
-        #     self.label.configure(text_color="white")
+        if self.enable_alpha:
+            self.alpha_slider.configure(progress_color=determine_alpha_slider_color_value())
+            self.alpha_slider_value.set(int("0x" + determine_alpha_slider_color(), 0))
 
     @staticmethod
     def projection_on_circle(point_x, point_y, circle_x, circle_y, radius):
@@ -425,9 +386,6 @@ class AskColor(customtkinter.CTkToplevel):
 
                 self.canvas.create_image(self.target_x, self.target_y, image=self.target)
 
-                # self.get_target_color()
-                # self.update_colors()
-
             if code.startswith(self.curr_code.lower()):
                 return
             self.curr_code = code
@@ -443,21 +401,10 @@ class AskColor(customtkinter.CTkToplevel):
             for i in range(0, self.image_dimension):
                 for j in range(0, self.image_dimension):
                     self.rgb_color = self.img1.getpixel((i, j))
-                    # print([r, g, b])
-                    # print([i, j])
-                    # print(self.rgb_color[0:3])
-                    # luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
-                    # This is the shading value
-                    # print(r * luma / 255, g * luma / 255, b * luma / 255)
-                    # print(rgb_to_hsv(r, g, b))
-                    # print(convert_to_value_100_rgb(r, g, b))
                     if color_dist(self.rgb_color[0:3], convert_to_value_100_rgb(r, g, b)) < 3:
                         self.target_x = i
                         self.target_y = j
                         refresh()
-                        # print([r, g, b])
-                        # luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
-                        # print(luma)
                         break
 
 
