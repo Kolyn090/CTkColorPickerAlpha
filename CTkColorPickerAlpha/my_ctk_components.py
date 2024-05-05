@@ -4,6 +4,11 @@ from PIL import Image
 import numpy
 
 
+IMAGES = [
+    'transparent_background.png'
+]
+
+
 class HexCustomCTkTextbox(customtkinter.CTkTextbox):
     # Test variables, copy-paste these into the textbox
     # Valid:
@@ -139,7 +144,7 @@ class ColorPreviewer(customtkinter.CTkLabel):
             def resize_array(arr):
                 return arr.repeat(2, axis=0).repeat(2, axis=1)
 
-            pic = Image.open('transparent_background.png')
+            pic = Image.open(IMAGES[0])
             result = numpy.array(pic)
             result = resize_array(result)
             result = resize_array(result)

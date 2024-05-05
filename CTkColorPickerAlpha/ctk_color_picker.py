@@ -1,6 +1,6 @@
 # CTk Color Picker for customtkinter
 # Original Author: Akash Bora (Akascape)
-# Contributers: Victor Vimbert-Guerlais (helloHackYnow)
+# Contributers: Victor Vimbert-Guerlais (helloHackYnow), Kolyn Lin
 
 import tkinter
 import random
@@ -15,6 +15,11 @@ from my_util import rgb_to_hsv
 from my_util import convert_to_value_100_rgb
 
 PATH = os.path.dirname(os.path.realpath(__file__))
+
+IMAGES = [
+    'target.png',
+    'color_wheel.png',
+]
 
 
 class AskColor(customtkinter.CTkToplevel):
@@ -86,8 +91,9 @@ class AskColor(customtkinter.CTkToplevel):
 
         def open_image(img_name, d):
             return Image.open(os.path.join(PATH, img_name)).resize((d, d), Image.Resampling.LANCZOS)
-        self.img1 = open_image('color_wheel.png', self.image_dimension)
-        self.img2 = open_image('target.png', self.target_dimension)
+
+        self.img1 = open_image(IMAGES[1], self.image_dimension)
+        self.img2 = open_image(IMAGES[0], self.target_dimension)
         self.wheel = ImageTk.PhotoImage(self.img1)
         self.target = ImageTk.PhotoImage(self.img2)
         self.canvas.create_image(self.image_dimension / 2, self.image_dimension / 2, image=self.wheel)

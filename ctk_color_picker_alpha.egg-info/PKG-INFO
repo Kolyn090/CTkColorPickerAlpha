@@ -1,3 +1,17 @@
+Metadata-Version: 2.1
+Name: ctk-color-picker-alpha
+Version: 0.0.1
+Summary: Forked from ctk_color_picker by Akash Bora. This version adds color alpha as a parameter.
+Home-page: https://github.com/Kolyn090/CTkColorPickerAlpha.git
+Author: Kolyn Lin
+Author-email: kanzakimakai27875628@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: CC0-1.0 License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # CTkColorPicker
 **A modern color picker made for customtkinter!**
 
