@@ -1,7 +1,7 @@
 # CTkColorPickerAlpha
 **A special color picker that supports picking transparent color (8-digits hex code)**
 
-![default](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-default.png=200x200)
+![default](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-default.png)
 
 <p align="center">
     <a href="https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-default.png?raw=true">
