@@ -1,25 +1,27 @@
 # CTkColorPicker
-**A modern color picker made for customtkinter!**
+**A special color picker that supports picking transparent color (8-digits hex code)**
 
-![Screenshot](https://user-images.githubusercontent.com/89206401/209182773-d76bf05c-610e-4297-aec5-7bb61a11d6d3.jpg)
+<p align="center">
+    <img alt="screenshot" src="readme_img/screenshot-default.png" width="300"/>
+    <img alt="screenshot" src="readme_img/screenshot-color.png" width="300"/>
+</p>
 
 ## Download
 
 ```
-pip install CTkColorPicker
-```
 
-### [<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/Akascape/CTkColorPicker?&color=white&label=Source%20Code&logo=Python&logoColor=yellow&style=for-the-badge"  width="300">](https://github.com/Akascape/CTkColorPicker/archive/refs/heads/main.zip)
+```
 
 ## Requirements
 - [customtkinter](https://github.com/TomSchimansky/CustomTkinter)
 - [pillow](https://pypi.org/project/Pillow/)
+- [numpy](https://numpy.org)
 
 ### How to use?
 
 ```python
 import customtkinter as ctk
-from CTkColorPickerAlpha import *
+from ctk-color-picker-alpha import *
 
 
 def ask_color():
@@ -36,48 +38,61 @@ root.mainloop()
 ```
 
 ## Options
-| Arguments | Description |
-|---------|-------------|
-| width | set the overall size of the color picker window |
-| title | change the title of color picker window |
-| fg_color | change forground color of the color picker frame |
-| bg_color | change background color of the color picker frame |
-| button_color | change the color of the button and slider |
-| button_hover_color | change the hover color of the buttons |
-| text | change the default text of the 'OK' button |
-| initial_color | set the default color of color picker (currently in beta stage) |
-| slider_border | change the border width of slider |
-| corner_radius | change the corner radius of all the widgets inside color picker |
-| _**other button parameters_ | pass other button arguments if required |
+| Arguments                   | Description                                                                                                   |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------|
+| width                       | set the overall size of the color picker window, always greater than 300 pixels                               |
+| title                       | change the title of color picker window                                                                       |
+| fg_color                    | change foreground color of the color picker frame                                                             |
+| bg_color                    | change background color of the color picker frame                                                             |
+| button_color                | change the color of the button and slider                                                                     |
+| button_hover_color          | change the hover color of the buttons                                                                         |
+| text                        | change the default text of the 'OK' button                                                                    |
+| initial_color               | set the default color of color picker (currently in beta stage)                                               |
+| slider_border               | change the border width of slider                                                                             |
+| corner_radius               | change the corner radius of all the widgets inside color picker                                               |
+| enable_previewer            | if True, display the color previewer                                                                          |
+| enable_alpha                | if True, enable 8-digits hex code and transparency. Otherwise, use 6-digits hex code and disable transparency |
+| allow_hexcode_modification  | if True, enable modifications to hex code textbox                                                             |
+| enable_random_button        | if True, display the 'Random' button                                                                          |
+| _**other button parameters_ | pass other button arguments if required                                                                       |
 
 # ColorPickerWidget
 **This is a new color picker widget that can be placed inside a customtkinter frame.**
 
-![Screenshot](https://github.com/Akascape/CTkColorPicker/assets/89206401/ca03751a-90a3-45e6-8ba4-745a92ab1c12)
+<p align="center">
+    <img alt="screenshot" src="readme_img/screenshot-widget.png" width="500"/>
+</p>
 
 ### Usage
 
 ```python
-from CTkColorPickerAlpha import *
+from ctk-color-picker-alpha import *
 import customtkinter
 
 root = customtkinter.CTk()
-colorpicker = CTkColorPicker(root, width=500, command=lambda e: print(e))
+colorpicker = CTkColorPicker(master=root)
 colorpicker.pack(padx=10, pady=10)
 root.mainloop()
 ```
 
 ## Options
-| Arguments | Description |
-|---------|-------------|
-| master | parent widget |
-| width | set the overall size of the color picker frame |
-| fg_color | change forground color of the color picker frame |
-| initial_color | set the default color of color picker (currently in beta stage) |
-| slider_border | change the border width of slider |
-| corner_radius | change the corner radius of all the widgets inside color picker |
-| command | add a command when the color is changed |
-| orientation | change orientation of slider and label |
-| _**other slider parameters_ | pass other slider arguments if required |
+| Arguments                   | Description                                                                                                   |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------|
+| master                      | parent widget                                                                                                 |
+| width                       | set the overall size of the color picker window, always greater than 300 pixels                               |
+| title                       | change the title of color picker window                                                                       |
+| fg_color                    | change foreground color of the color picker frame                                                             |
+| bg_color                    | change background color of the color picker frame                                                             |
+| button_color                | change the color of the button and slider                                                                     |
+| button_hover_color          | change the hover color of the buttons                                                                         |
+| text                        | change the default text of the 'OK' button                                                                    |
+| initial_color               | set the default color of color picker (currently in beta stage)                                               |
+| slider_border               | change the border width of slider                                                                             |
+| corner_radius               | change the corner radius of all the widgets inside color picker                                               |
+| enable_previewer            | if True, display the color previewer                                                                          |
+| enable_alpha                | if True, enable 8-digits hex code and transparency. Otherwise, use 6-digits hex code and disable transparency |
+| allow_hexcode_modification  | if True, enable modifications to hex code textbox                                                             |
+| enable_random_button        | if True, display the 'Random' button                                                                          |
+| _**other button parameters_ | pass other button arguments if required                                                                       |
 
-**That's all, hope it will help!**
+**Forked from https://github.com/Akascape/CTkColorPicker**
