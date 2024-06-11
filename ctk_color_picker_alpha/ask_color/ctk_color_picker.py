@@ -14,7 +14,7 @@ from ctk_color_picker_alpha.util import rgb_to_hsv, convert_to_value_100_rgb
 
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-PATH = os.path.dirname(os.path.realpath(__file__))
+# PATH = os.path.dirname(os.path.realpath(__file__))
 
 IMAGES = [
     'target.png',
