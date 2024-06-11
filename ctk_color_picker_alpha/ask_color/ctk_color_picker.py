@@ -298,7 +298,8 @@ class AskColor(customtkinter.CTkToplevel):
                 result = "0" + result
             return result
 
-        self.update_hexbox_label(self.default_hex_color + (get_alpha() if self.enable_alpha else ''))
+        self.curr_code = self.default_hex_color + (get_alpha() if self.enable_alpha else '')
+        self.update_hexbox_label(self.curr_code)
 
     def update_colors2(self, code):
         r, g, b = tuple(int(code.lstrip('#')[i:i + 2], 16) for i in (0, 2, 4))
@@ -414,6 +415,7 @@ class AskColor(customtkinter.CTkToplevel):
                         break
 
 
-# if __name__ == "__main__":
-#     app = AskColor()
-#     app.mainloop()
+if __name__ == "__main__":
+    app = AskColor()
+    print(app.get())
+    app.mainloop()

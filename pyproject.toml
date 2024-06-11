@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ctk-color-picker-alpha"
-version = "0.8.7"
+version = "0.8.8"
 description = "An eight-digits hex code color picker, with alpha value."
 authors = ["Kolyn Lin <Kanzakimakai27875628@gmail.com>"]
 license = "CC0 1.0 Universal"

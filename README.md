@@ -25,7 +25,7 @@ from ctk_color_picker_alpha import *
 def ask_color():
     pick_color = AskColor()  # open the color picker
     color = pick_color.get()  # get the color string
-    button.configure(fg_color=color)
+    print(color)
 
 
 root = ctk.CTk()
