@@ -1,16 +1,8 @@
 # CTkColorPickerAlpha
 **A special color picker that supports picking transparent color (8-digits hex code)**
 
-![default](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-default.png)
-
-<p align="center">
-    <a href="https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-default.png?raw=true">
-        <img alt="default" src="readme_img/screenshot-default.png" width="300" />
-    </a>
-    <a href="https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-color.png?raw=true">
-        <img alt="colored" src="readme_img/screenshot-default.png" width="300" />
-    </a>
-</p>
+![default](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/0162564c755a4242e69aae7b2d50e2a38d8f7315/readme_img/screenshot-default.png)
+![colored](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/0162564c755a4242e69aae7b2d50e2a38d8f7315/readme_img/screenshot-color.png)
 
 ## Download
 
@@ -65,11 +57,7 @@ root.mainloop()
 # ColorPickerWidget
 **This is a new color picker widget that can be placed inside a customtkinter frame.**
 
-<p align="center">
-    <a href="https://github.com/Kolyn090/CTkColorPickerAlpha/blob/main/readme_img/screenshot-widget.png?raw=true">
-        <img alt="widget" src="readme_img/screenshot-widget.png" width="300" />
-    </a>
-</p>
+![widget](https://github.com/Kolyn090/CTkColorPickerAlpha/blob/0162564c755a4242e69aae7b2d50e2a38d8f7315/readme_img/screenshot-widget.png)
 
 ### Usage
 
