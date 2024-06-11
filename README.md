@@ -19,7 +19,7 @@ pip install ctk-color-picker-alpha
 
 ```python
 import customtkinter as ctk
-from ctk-color-picker-alpha import *
+from ctk_color_picker_alpha import *
 
 
 def ask_color():
@@ -62,7 +62,7 @@ root.mainloop()
 ### Usage
 
 ```python
-from ctk-color-picker-alpha import *
+from ctk_color_picker_alpha import *
 import customtkinter
 
 root = customtkinter.CTk()

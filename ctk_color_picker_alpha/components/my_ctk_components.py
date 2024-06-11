@@ -2,8 +2,10 @@ import string
 import customtkinter
 from PIL import Image
 import numpy
+import os
 
 
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 IMAGES = [
     'transparent_background.png'
 ]
@@ -144,7 +146,7 @@ class ColorPreviewer(customtkinter.CTkLabel):
             def resize_array(arr):
                 return arr.repeat(2, axis=0).repeat(2, axis=1)
 
-            pic = Image.open(IMAGES[0])
+            pic = Image.open(os.path.join(parent_dir, IMAGES[0]))
             result = numpy.array(pic)
             result = resize_array(result)
             result = resize_array(result)

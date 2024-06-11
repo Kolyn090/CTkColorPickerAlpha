@@ -9,11 +9,11 @@ import customtkinter
 from PIL import Image, ImageTk
 import os
 import math
-from my_ctk_components import HexCustomCTkTextbox
-from my_ctk_components import ColorPreviewer
-from my_util import rgb_to_hsv
-from my_util import convert_to_value_100_rgb
+from ctk_color_picker_alpha.components import HexCustomCTkTextbox, ColorPreviewer
+from ctk_color_picker_alpha.util import rgb_to_hsv, convert_to_value_100_rgb
 
+
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 IMAGES = [
@@ -90,7 +90,7 @@ class AskColor(customtkinter.CTkToplevel):
         self.canvas.bind("<B1-Motion>", self.on_mouse_drag)
 
         def open_image(img_name, d):
-            return Image.open(os.path.join(PATH, img_name)).resize((d, d), Image.Resampling.LANCZOS)
+            return Image.open(os.path.join(parent_dir, img_name)).resize((d, d), Image.Resampling.LANCZOS)
 
         self.img1 = open_image(IMAGES[1], self.image_dimension)
         self.img2 = open_image(IMAGES[0], self.target_dimension)
@@ -414,6 +414,6 @@ class AskColor(customtkinter.CTkToplevel):
                         break
 
 
-if __name__ == "__main__":
-    app = AskColor()
-    app.mainloop()
+# if __name__ == "__main__":
+#     app = AskColor()
+#     app.mainloop()

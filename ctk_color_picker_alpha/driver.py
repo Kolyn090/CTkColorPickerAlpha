@@ -1,7 +1,4 @@
-from my_util import rgb_to_hsv
-from my_util import hsv_to_rgb
-from my_util import convert_to_value_100_rgb
-from ctk_color_picker_widget import CTkColorPicker
+from ctk_color_picker_alpha.widget.ctk_color_picker_widget import CTkColorPicker
 import customtkinter
 
 
