@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ctk-color-picker-alpha"
-version = "0.8.8"
+version = "0.8.9"
 description = "An eight-digits hex code color picker, with alpha value."
 authors = ["Kolyn Lin <Kanzakimakai27875628@gmail.com>"]
 license = "CC0 1.0 Universal"
@@ -12,6 +12,10 @@ customtkinter = "5.2.2"
 numpy = "1.26.4"
 pillow = "10.3.0"
 
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.2.2"
+requests-mock = "^1.12.1"
 
 [build-system]
 requires = ["poetry-core"]
