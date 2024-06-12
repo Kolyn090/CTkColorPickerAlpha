@@ -16,6 +16,7 @@ pillow = "10.3.0"
 [tool.poetry.group.test.dependencies]
 pytest = "^8.2.2"
 requests-mock = "^1.12.1"
+pyautogui = "^0.9.54"
 
 [build-system]
 requires = ["poetry-core"]
